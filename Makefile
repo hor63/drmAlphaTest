@@ -5,7 +5,7 @@ LDFLAGS := $(shell pkg-config --libs libdrm egl glesv2)
 
 TARGETS := drmAlphaTest
 
-CXX := g++
+CXX ?= g++
 
 CFLAGS += -g3 -O0
 
@@ -20,7 +20,7 @@ clean:
 OBJECTS_drmAlphaTest = drmAlphaTest.o
 
 .cpp.o:
-	bear --append -- $(CXX) -c $(CFLAGS) -o $@ -MD -MP $<
+	$(CXX) -c $(CFLAGS) -o $@ -MD -MP $<
 
 drmAlphaTest: $(OBJECTS_drmAlphaTest)
 	$(CXX) $(CFLAGS) $? $(LDFLAGS) -o $@

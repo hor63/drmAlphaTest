@@ -11,13 +11,13 @@
 #include <unistd.h>
 
 int main () {
-	int rc = 0;
+	int numFiles = 0;
 	
 	std::cout << "Hello" << std::endl;
 	
 	struct dirent64** direntList = nullptr;
 	
-	rc = ::scandir64("/dev/dri",&direntList,
+	numFiles = scandir64("/dev/dri",&direntList,
 		[](const struct dirent64 *dirent) {
 			if (dirent->d_type == DT_CHR){
 			return 1;
@@ -30,9 +30,9 @@ int main () {
 		}
 	);
 
-	std::cout << "scandir64 returned = " << rc << std::endl;
+	std::cout << "scandir64 returned = " << numFiles << std::endl;
 	
-	for (int i = 0 ; i < rc; ++i) {
+	for (int i = 0 ; i < numFiles; ++i) {
 		
 		std::cout << "directory entry #" << i << " = " 
 			<< direntList[i]->d_name
@@ -71,7 +71,7 @@ int main () {
 				for (int j = 0; j < drmRes->count_crtcs; ++j) {
 					auto crtc = drmModeGetCrtc(fd,drmRes->crtcs[j]);
 					if (crtc != nullptr) {
-						std::cout << "crtc ["<<j << ":"
+						std::cout << "Crtc ["<<j << "]:"
 						<< " crtc_id = " << crtc->crtc_id
 						<< " buffer_id = " << crtc->buffer_id
 						<< " x = " << crtc->x
@@ -82,17 +82,60 @@ int main () {
 						<< " mode.name = " << crtc->mode.name
 						<< " gamma_size = " << crtc->gamma_size
 						<< std::endl;
+						
+						drmModeFreeCrtc(crtc);
 					}
+				}	
+
+				for (int j = 0; j<drmRes->count_connectors ; ++j) {
+					
+					auto conn = drmModeGetConnector(fd,drmRes->connectors[j]);
+					if (conn != nullptr) {
+						std::cout << "Connector [" << j << "]:"
+						<< " connector_id = " << conn->connector_id
+						<< ", encoder_id = " << conn->encoder_id
+						<< ", connector_type = " << conn->connector_type
+						<< ", connector_type_id = " << conn->connector_type_id
+						<< ", connection = " << conn->connection
+						<< ", mmWidth = " << conn->mmWidth
+						<< ", mmHeight = " << conn->mmHeight
+						<< ", subpixel = " << conn->subpixel
+						<< ", count_modes = " << conn->count_modes
+						<< ", count_props = " << conn->count_props
+						<< ", count_encoders = " << conn->count_encoders
+						<< std::endl;
+						for (int k = 0 ; k<conn->count_modes ;++k) {
+							auto &mode = conn->modes[k];
+							std::cout << "\tmodes["<<k<<"]:"
+							<< " clock = " << mode.clock
+							<< ", hdisplay = " << mode.hdisplay
+							<< ", vdisplay = " << mode.vdisplay
+							<< ", vrefresh = " << mode.vrefresh
+							<< ", flags = " << mode.flags
+							<< ", type = " << mode.type
+							<< ", name = " << mode.name
+							<< std::endl;
+						}
+//						uint32_t *props; /**< List of property ids */
+//						uint64_t 	*prop_values; /**< List of property values */
+						std::cout << "\tEncoders = ";
+						for (int k = 0 ; k<conn->count_encoders ;++k) {
+							std::cout << conn->encoders[k] << ' ';
+						}
+						std::cout << std::endl;
+						drmModeFreeConnector(conn);
+					}
+					
 				}
 				
 				::drmModeFreeResources(drmRes);
-			}
+			} //if (drmRes == nullptr) {
 				
 			::close(fd);
-		}
+		} // if (fd < 0) {
 
 			
-	}
+	} // for (int i = 0 ; i < numFiles; ++i) {
 	
 	
 	if (direntList != nullptr) {
