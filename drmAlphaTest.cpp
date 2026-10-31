@@ -57,7 +57,8 @@ main()
         drmDevicePtrs[i]->nodes[DRM_NODE_RENDER] : "<NULL>") << std::endl;
 
         if (!(drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))) {
-          // Huu? Does not have a primary node???
+          std::cout << "Huu? Does not have a primary node???"
+            "Continue with next device" << std::endl;
           continue;
         }
     std::string primaryNodeFileName = drmDevicePtrs[i]->nodes[DRM_NODE_PRIMARY];
@@ -132,9 +133,18 @@ main()
             //						uint32_t *props; /**< List of property ids */
             //						uint64_t 	*prop_values; /**< List of property values
             //*/
-            std::cout << "\tEncoders = ";
+            std::cout << "\tEncoders:" << std::endl;
             for (int k = 0; k < conn->count_encoders; ++k) {
-              std::cout << conn->encoders[k] << ' ';
+              auto encoder = drmModeGetEncoder(fd,conn->encoders[k]);
+              if (encoder) {
+                std::cout << "\t\t" << "Encoder[" << k << "]:"
+                << " encoder_id = " << encoder->encoder_id
+                << " encoder_type = " << encoder->encoder_type
+                << " crtc_id = " << encoder->crtc_id
+                << " possible_crtcs = " << encoder->possible_crtcs
+                  << std::endl;
+                drmModeFreeEncoder(encoder);
+              }
             }
             std::cout << std::endl;
             drmModeFreeConnector(conn);
