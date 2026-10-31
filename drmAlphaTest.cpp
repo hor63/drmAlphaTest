@@ -110,7 +110,10 @@ main()
                       << " connector_id = " << conn->connector_id
                       << ", encoder_id = " << conn->encoder_id
                       << ", connector_type = " << conn->connector_type
-                      << ", connector_type_id = " << conn->connector_type_id
+                      << "= " << (drmModeGetConnectorTypeName(conn->connector_type)?
+                                  drmModeGetConnectorTypeName(conn->connector_type):
+                                  "Unknown")
+                      << "\n\t\t, connector_type_id = " << conn->connector_type_id
                       << ", connection = " << conn->connection
                       << ", mmWidth = " << conn->mmWidth
                       << ", mmHeight = " << conn->mmHeight
