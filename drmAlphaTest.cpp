@@ -1,53 +1,73 @@
 
 #include <cerrno>
 #include <cstring>
-#include <dirent.h>
 #include <fcntl.h>
-#include <iostream>
-#include <string>
+#include <ios>
 #include <unistd.h>
 #include <xf86drm.h>
 #include <xf86drmMode.h>
 
+#include <iostream>
+#include <string>
+#include <vector>
+
+
+
 int
 main()
 {
-  int numFiles = 0;
 
   std::cout << "Hello" << std::endl;
 
-  struct dirent64 **direntList = nullptr;
+  auto numFiles = drmGetDevices2(0, NULL, 0);
+  std::cout << "Number of drm devices = " << numFiles << std::endl;
 
-  numFiles = scandir64(
-    "/dev/dri",
-    &direntList,
-    [](const struct dirent64 *dirent) {
-      if (dirent->d_type == DT_CHR) {
-        return 1;
-      } else {
-        return 0;
-      }
-    },
-    [](const struct dirent64 **, const struct dirent64 **) { return 1; });
+  std::vector<drmDevicePtr> drmDevicePtrs;
 
-  std::cout << "scandir64 returned = " << numFiles << std::endl;
-
+  if (numFiles > 0) {
+    drmDevicePtrs = std::vector<drmDevicePtr>{static_cast<size_t>(numFiles)};
+      
+    numFiles = drmGetDevices2(0U, drmDevicePtrs.data(), numFiles);
+    std::cout << "Number of drm devices = " << numFiles << std::endl;
+    std::cout << "drmDevicePtrs.size() = " << drmDevicePtrs.size() << std::endl;
+    
+    if (numFiles != drmDevicePtrs.size()) {
+      std::cout << "Error: drmGetDevices2 returned " << numFiles
+        << ". Exiting" << std::endl;
+    exit(1);
+    }
+  } // if (numFiles > 0) {
+    
   for (int i = 0; i < numFiles; ++i) {
+    std::cout << "Device no. " << i << ": " << std::endl;
+    
+    std::cout << "\tbustype = " << drmDevicePtrs[i]->bustype << std::endl;
+    std::cout << "\tavailable_nodes = " 
+      << std::hex << drmDevicePtrs[i]->available_nodes << std::dec
+      << std::endl;
+      
+      std::cout << "\tDRM_NODE_PRIMARY = " 
+        << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY)) ?
+        drmDevicePtrs[i]->nodes[DRM_NODE_PRIMARY] : "<NULL>") << std::endl;
+      std::cout << "\tDRM_NODE_CONTROL = " 
+        << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY)) ?
+        drmDevicePtrs[i]->nodes[DRM_NODE_CONTROL] : "<NULL>") << std::endl;
+      std::cout << "\tDRM_NODE_RENDER = " 
+        << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY)) ?
+        drmDevicePtrs[i]->nodes[DRM_NODE_RENDER] : "<NULL>") << std::endl;
 
-    std::cout << "directory entry #" << i << " = " << direntList[i]->d_name
-              << ", type = " << static_cast<int>(direntList[i]->d_type)
-              << std::endl;
-
-    std::string absFileName = "/dev/dri/";
-    absFileName.append(direntList[i]->d_name);
-
-    auto fd = ::open(absFileName.c_str(), O_RDWR, 0666);
+        if (!(drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))) {
+          // Huu? Does not have a primary node???
+          continue;
+        }
+    std::string primaryNodeFileName = drmDevicePtrs[i]->nodes[DRM_NODE_PRIMARY];
+    auto fd = ::open(primaryNodeFileName.c_str(), O_RDWR, 0666);
     if (fd < 0) {
       auto err = errno;
-      std::cerr << "Could not open " << absFileName.c_str() << ". Error is "
+      std::cerr << "Could not open " << primaryNodeFileName << ". Error is "
                 << strerrorname_np(err) << std::endl;
     } else {
-      std::cout << "fd for " << absFileName << " = " << fd << std::endl;
+      std::cout << "fd for " << primaryNodeFileName << " = " << fd << std::endl;
 
       auto drmRes = ::drmModeGetResources(fd);
       if (drmRes == nullptr) {
@@ -82,7 +102,8 @@ main()
 
         for (int j = 0; j < drmRes->count_connectors; ++j) {
 
-          auto conn = drmModeGetConnector(fd, drmRes->connectors[j]);
+          auto conn = drmModeGetConnector(
+            fd, drmRes->connectors[j]);
           if (conn != nullptr) {
             std::cout << "Connector [" << j << "]:"
                       << " connector_id = " << conn->connector_id
@@ -128,7 +149,7 @@ main()
 
   } // for (int i = 0 ; i < numFiles; ++i) {
 
-  if (direntList != nullptr) {
-    ::free(direntList);
-  }
+  drmFreeDevices(drmDevicePtrs.data(), drmDevicePtrs.size());
+
+  return 0;
 }
