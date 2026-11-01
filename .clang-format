@@ -2,7 +2,7 @@ BasedOnStyle: LLVM
 IndentWidth: 2
 TabWidth: 2
 UseTab: Never
-ColumnLimit: 79
+ColumnLimit: 100
 
 # Indent namespace blocks by zero spaces
 NamespaceIndentation: None

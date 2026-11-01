@@ -1,17 +1,11 @@
 
-#include <cerrno>
-#include <cstring>
-#include <fcntl.h>
-#include <ios>
-#include <unistd.h>
-#include <xf86drm.h>
-#include <xf86drmMode.h>
 
+#include "drmCxxWrappers.h"
+
+#include <exception>
 #include <iostream>
 #include <string>
 #include <vector>
-
-
 
 int
 main()
@@ -26,51 +20,52 @@ main()
 
   if (numFiles > 0) {
     drmDevicePtrs = std::vector<drmDevicePtr>{static_cast<size_t>(numFiles)};
-      
+
     numFiles = drmGetDevices2(0U, drmDevicePtrs.data(), numFiles);
     std::cout << "Number of drm devices = " << numFiles << std::endl;
     std::cout << "drmDevicePtrs.size() = " << drmDevicePtrs.size() << std::endl;
-    
+
     if (numFiles != drmDevicePtrs.size()) {
-      std::cout << "Error: drmGetDevices2 returned " << numFiles
-        << ". Exiting" << std::endl;
-    exit(1);
+      std::cout << "Error: drmGetDevices2 returned " << numFiles << ". Exiting" << std::endl;
+      exit(1);
     }
   } // if (numFiles > 0) {
-    
+
   for (int i = 0; i < numFiles; ++i) {
     std::cout << "Device no. " << i << ": " << std::endl;
-    
+
     std::cout << "\tbustype = " << drmDevicePtrs[i]->bustype << std::endl;
-    std::cout << "\tavailable_nodes = " 
-      << std::hex << drmDevicePtrs[i]->available_nodes << std::dec
-      << std::endl;
-      
-      std::cout << "\tDRM_NODE_PRIMARY = " 
-        << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY)) ?
-        drmDevicePtrs[i]->nodes[DRM_NODE_PRIMARY] : "<NULL>") << std::endl;
-      std::cout << "\tDRM_NODE_CONTROL = " 
-        << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY)) ?
-        drmDevicePtrs[i]->nodes[DRM_NODE_CONTROL] : "<NULL>") << std::endl;
-      std::cout << "\tDRM_NODE_RENDER = " 
-        << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY)) ?
-        drmDevicePtrs[i]->nodes[DRM_NODE_RENDER] : "<NULL>") << std::endl;
+    std::cout << "\tavailable_nodes = " << std::hex << drmDevicePtrs[i]->available_nodes << std::dec
+              << std::endl;
 
-        if (!(drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))) {
-          std::cout << "Huu? Does not have a primary node???"
-            "Continue with next device" << std::endl;
-          continue;
-        }
-    std::string primaryNodeFileName = drmDevicePtrs[i]->nodes[DRM_NODE_PRIMARY];
-    auto fd = ::open(primaryNodeFileName.c_str(), O_RDWR, 0666);
-    if (fd < 0) {
-      auto err = errno;
-      std::cerr << "Could not open " << primaryNodeFileName << ". Error is "
-                << strerrorname_np(err) << std::endl;
-    } else {
-      std::cout << "fd for " << primaryNodeFileName << " = " << fd << std::endl;
+    std::cout << "\tDRM_NODE_PRIMARY = "
+              << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))
+                    ? drmDevicePtrs[i]->nodes[DRM_NODE_PRIMARY]
+                    : "<NULL>")
+              << std::endl;
+    std::cout << "\tDRM_NODE_CONTROL = "
+              << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))
+                    ? drmDevicePtrs[i]->nodes[DRM_NODE_CONTROL]
+                    : "<NULL>")
+              << std::endl;
+    std::cout << "\tDRM_NODE_RENDER = "
+              << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))
+                    ? drmDevicePtrs[i]->nodes[DRM_NODE_RENDER]
+                    : "<NULL>")
+              << std::endl;
 
-      auto drmRes = ::drmModeGetResources(fd);
+    if (!(drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))) {
+      std::cout << "Huu? Does not have a primary node???"
+                   "Continue with next device"
+                << std::endl;
+      continue;
+    }
+    try {
+      Drm::FileDescrShPtr fileDescr =
+        std::make_shared<Drm::FileDescr>(drmDevicePtrs[i]->nodes[DRM_NODE_PRIMARY], O_RDWR);
+      std::cout << "fd for " << fileDescr->getFileName() << " = " << fileDescr->get() << std::endl;
+
+      auto drmRes = ::drmModeGetResources(fileDescr->get());
       if (drmRes == nullptr) {
         std::cerr << " Could not obtain DRM mode resources" << std::endl;
       } else {
@@ -79,8 +74,7 @@ main()
                   << " count_crtcs = " << drmRes->count_crtcs
                   << " count_connectors = " << drmRes->count_connectors
                   << " count_encoders = " << drmRes->count_encoders
-                  << " min_width = " << drmRes->min_width
-                  << " max_width = " << drmRes->max_width
+                  << " min_width = " << drmRes->min_width << " max_width = " << drmRes->max_width
                   << " min_height = " << drmRes->min_height
                   << " max_height = " << drmRes->max_height << std::endl;
 
@@ -88,14 +82,11 @@ main()
           auto crtc = drmModeGetCrtc(fd, drmRes->crtcs[j]);
           if (crtc != nullptr) {
             std::cout << "Crtc [" << j << "]:"
-                      << " crtc_id = " << crtc->crtc_id
-                      << " buffer_id = " << crtc->buffer_id
-                      << " x = " << crtc->x << " y = " << crtc->y
-                      << " width = " << crtc->width
-                      << " height = " << crtc->height
-                      << " mode_valid = " << crtc->mode_valid
-                      << " mode.name = " << crtc->mode.name
-                      << " gamma_size = " << crtc->gamma_size << std::endl;
+                      << " crtc_id = " << crtc->crtc_id << " buffer_id = " << crtc->buffer_id
+                      << " x = " << crtc->x << " y = " << crtc->y << " width = " << crtc->width
+                      << " height = " << crtc->height << " mode_valid = " << crtc->mode_valid
+                      << " mode.name = " << crtc->mode.name << " gamma_size = " << crtc->gamma_size
+                      << std::endl;
 
             drmModeFreeCrtc(crtc);
           }
@@ -103,49 +94,41 @@ main()
 
         for (int j = 0; j < drmRes->count_connectors; ++j) {
 
-          auto conn = drmModeGetConnector(
-            fd, drmRes->connectors[j]);
+          auto conn = drmModeGetConnector(fd, drmRes->connectors[j]);
           if (conn != nullptr) {
             std::cout << "Connector [" << j << "]:"
                       << " connector_id = " << conn->connector_id
                       << ", encoder_id = " << conn->encoder_id
-                      << ", connector_type = " << conn->connector_type
-                      << "= " << (drmModeGetConnectorTypeName(conn->connector_type)?
-                                  drmModeGetConnectorTypeName(conn->connector_type):
-                                  "Unknown")
+                      << ", connector_type = " << conn->connector_type << "= "
+                      << (drmModeGetConnectorTypeName(conn->connector_type)
+                            ? drmModeGetConnectorTypeName(conn->connector_type)
+                            : "Unknown")
                       << "\n\t\t, connector_type_id = " << conn->connector_type_id
-                      << ", connection = " << conn->connection
-                      << ", mmWidth = " << conn->mmWidth
-                      << ", mmHeight = " << conn->mmHeight
-                      << ", subpixel = " << conn->subpixel
+                      << ", connection = " << conn->connection << ", mmWidth = " << conn->mmWidth
+                      << ", mmHeight = " << conn->mmHeight << ", subpixel = " << conn->subpixel
                       << ", count_modes = " << conn->count_modes
                       << ", count_props = " << conn->count_props
-                      << ", count_encoders = " << conn->count_encoders
-                      << std::endl;
+                      << ", count_encoders = " << conn->count_encoders << std::endl;
             for (int k = 0; k < conn->count_modes; ++k) {
               auto &mode = conn->modes[k];
               std::cout << "\tmodes[" << k << "]:"
-                        << " clock = " << mode.clock
-                        << ", hdisplay = " << mode.hdisplay
-                        << ", vdisplay = " << mode.vdisplay
-                        << ", vrefresh = " << mode.vrefresh
-                        << ", flags = " << mode.flags
-                        << ", type = " << mode.type << ", name = " << mode.name
-                        << std::endl;
+                        << " clock = " << mode.clock << ", hdisplay = " << mode.hdisplay
+                        << ", vdisplay = " << mode.vdisplay << ", vrefresh = " << mode.vrefresh
+                        << ", flags = " << mode.flags << ", type = " << mode.type
+                        << ", name = " << mode.name << std::endl;
             }
             //						uint32_t *props; /**< List of property ids */
             //						uint64_t 	*prop_values; /**< List of property values
             //*/
             std::cout << "\tEncoders:" << std::endl;
             for (int k = 0; k < conn->count_encoders; ++k) {
-              auto encoder = drmModeGetEncoder(fd,conn->encoders[k]);
+              auto encoder = drmModeGetEncoder(fd, conn->encoders[k]);
               if (encoder) {
                 std::cout << "\t\t" << "Encoder[" << k << "]:"
-                << " encoder_id = " << encoder->encoder_id
-                << " encoder_type = " << encoder->encoder_type
-                << " crtc_id = " << encoder->crtc_id
-                << " possible_crtcs = " << encoder->possible_crtcs
-                  << std::endl;
+                          << " encoder_id = " << encoder->encoder_id
+                          << " encoder_type = " << encoder->encoder_type
+                          << " crtc_id = " << encoder->crtc_id
+                          << " possible_crtcs = " << encoder->possible_crtcs << std::endl;
                 drmModeFreeEncoder(encoder);
               }
             }
@@ -155,10 +138,15 @@ main()
         }
 
         ::drmModeFreeResources(drmRes);
-      } // if (drmRes == nullptr) {
+      } // if (drmRes == nullptr)
 
-      ::close(fd);
-    } // if (fd < 0) {
+      std::cout << "FD " << fileDescr->get() << " of file " << fileDescr->getFileName()
+                << " supports Kernel Mode Switching: "
+                << (drmIsKMS(fileDescr->get()) ? "Yes" : "No") << std::endl;
+
+    } catch (std::exception const &exp) {
+      std::cerr << exp.what();
+    }
 
   } // for (int i = 0 ; i < numFiles; ++i) {
 
