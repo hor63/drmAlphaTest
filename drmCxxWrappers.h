@@ -163,7 +163,7 @@ public:
 
   DrmModeResource(DrmModeResource &&source) noexcept
   {
-    if (modeResources) {
+    if (modeResources != nullptr) {
       drmModeFreeResources(modeResources);
     }
     modeResources        = source.modeResources;
@@ -173,13 +173,19 @@ public:
 
   DrmModeResource &operator=(DrmModeResource &&source) noexcept
   {
-    if (modeResources) {
+    if (modeResources != nullptr) {
       drmModeFreeResources(modeResources);
     }
     modeResources        = source.modeResources;
     source.modeResources = nullptr;
     fileDescr            = std::move(source.fileDescr);
+
     return *this;
+  }
+
+  ::drmModeResPtr const get() const noexcept
+  {
+    return modeResources;
   }
 
   ::drmModeResPtr const operator->() const
@@ -187,12 +193,164 @@ public:
 
     if (modeResources == nullptr) {
       throw ExceptionDrmModeResource(
-        "Trying de-referencing a nullptr of Drm::DrmModeResource object");
+        "Trying de-referencing a nullptr of a Drm::DrmModeResource object");
     }
 
     return modeResources;
   }
 }; // class DrmModeRes
+
+class ExceptionDrmModeCrtc final : public ExceptionBase
+{
+public:
+  ExceptionDrmModeCrtc(FileDescrShPtr const &fileDescr, uint32_t crtcID)
+      : ExceptionBase{std::move([](FileDescrShPtr const &fileDescr, uint32_t crtcID) {
+          std::string str{"::drmModeGetCrtc returned NULL for file \""};
+          str.append(fileDescr->getFileName())
+            .append("\" and crtc_id = ")
+            .append(std::to_string(crtcID));
+          return str;
+        }(fileDescr, crtcID))}
+  {
+  }
+  ExceptionDrmModeCrtc(std::string reason) : ExceptionBase{reason} {}
+}; // class ExceptionDrmModeResource
+
+class DrmModeCrtc final
+{
+private:
+  FileDescrShPtr fileDescr;
+  ::drmModeCrtcPtr modeCrtc = nullptr;
+
+public:
+  DrmModeCrtc(FileDescrShPtr const &fileDescrShPtr, uint32_t crtcId)
+      : fileDescr{fileDescrShPtr}, modeCrtc{::drmModeGetCrtc(fileDescrShPtr->get(), crtcId)}
+  {
+    if (modeCrtc == nullptr) {
+      throw ExceptionDrmModeCrtc(fileDescrShPtr, crtcId);
+    }
+  }
+  ~DrmModeCrtc()
+  {
+    if (modeCrtc != nullptr) {
+      ::drmModeFreeCrtc(modeCrtc);
+    }
+  }
+
+  DrmModeCrtc(DrmModeCrtc const &)            = delete;
+  DrmModeCrtc &operator=(DrmModeCrtc const &) = delete;
+
+  DrmModeCrtc(DrmModeCrtc &&source) noexcept
+  {
+    if (modeCrtc != nullptr) {
+      ::drmModeFreeCrtc(modeCrtc);
+    }
+    modeCrtc        = source.modeCrtc;
+    source.modeCrtc = nullptr;
+    fileDescr       = std::move(source.fileDescr);
+  }
+  DrmModeCrtc &operator=(DrmModeCrtc &&source) noexcept
+  {
+    if (modeCrtc != nullptr) {
+      ::drmModeFreeCrtc(modeCrtc);
+    }
+    modeCrtc        = source.modeCrtc;
+    source.modeCrtc = nullptr;
+    fileDescr       = std::move(source.fileDescr);
+
+    return *this;
+  }
+
+  ::drmModeCrtcPtr const get() const noexcept
+  {
+    return modeCrtc;
+  }
+  ::drmModeCrtcPtr const operator->() const
+  {
+    if (modeCrtc == nullptr) {
+      throw ExceptionDrmModeCrtc("Trying de-referencing a nullptr of a Drm::DrmModeCrtc object");
+    }
+    return modeCrtc;
+  }
+
+}; // class DrmModeCrtc
+
+class ExceptionDrmModeConnector final : public ExceptionBase
+{
+public:
+  ExceptionDrmModeConnector(FileDescrShPtr const &fileDescr, uint32_t connectorID)
+      : ExceptionBase{std::move([](FileDescrShPtr const &fileDescr, uint32_t connectorID) {
+          std::string str{"::drmModeGetConnector returned NULL for file \""};
+          str.append(fileDescr->getFileName())
+            .append("\" and crtc_id = ")
+            .append(std::to_string(connectorID));
+          return str;
+        }(fileDescr, connectorID))}
+  {
+  }
+  ExceptionDrmModeConnector(std::string reason) : ExceptionBase{reason} {}
+}; // class ExceptionDrmModeResource
+
+class DrmModeConnector final
+{
+private:
+  FileDescrShPtr fileDescr;
+  ::drmModeConnectorPtr modeConnector = nullptr;
+
+public:
+  DrmModeConnector(FileDescrShPtr const &fileDescrShPtr, uint32_t connectorId)
+      : fileDescr{fileDescrShPtr},
+        modeConnector{::drmModeGetConnector(fileDescrShPtr->get(), connectorId)}
+  {
+    if (modeConnector == nullptr) {
+      throw ExceptionDrmModeConnector(fileDescrShPtr, connectorId);
+    }
+  }
+  ~DrmModeConnector()
+  {
+    if (modeConnector != nullptr) {
+      ::drmModeFreeConnector(modeConnector);
+    }
+  }
+
+  DrmModeConnector(DrmModeConnector const &)            = delete;
+  DrmModeConnector &operator=(DrmModeConnector const &) = delete;
+
+  DrmModeConnector(DrmModeConnector &&source) noexcept
+  {
+    if (modeConnector != nullptr) {
+      ::drmModeFreeConnector(modeConnector);
+    }
+    modeConnector        = source.modeConnector;
+    source.modeConnector = nullptr;
+    fileDescr            = std::move(source.fileDescr);
+  }
+  DrmModeConnector &operator=(DrmModeConnector &&source) noexcept
+  {
+    if (modeConnector != nullptr) {
+      ::drmModeFreeConnector(modeConnector);
+    }
+    modeConnector        = source.modeConnector;
+    source.modeConnector = nullptr;
+    fileDescr            = std::move(source.fileDescr);
+
+    return *this;
+  }
+
+  ::drmModeConnectorPtr const get() const noexcept
+  {
+    return modeConnector;
+  }
+  ::drmModeConnectorPtr const operator->() const
+  {
+    if (modeConnector == nullptr) {
+      throw ExceptionDrmModeConnector(
+        "Trying de-referencing a nullptr of a Drm::DrmModeConnector object");
+    }
+    return modeConnector;
+  }
+
+}; // class DrmModeConnector
 
 }; // namespace Drm
 #endif /* DRMCXXWRAPPERS_H_ */
