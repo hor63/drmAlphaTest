@@ -13,48 +13,74 @@ main()
 
   std::cout << "Hello" << std::endl;
 
-  auto numFiles = drmGetDevices2(0, NULL, 0);
-  std::cout << "Number of drm devices = " << numFiles << std::endl;
+  auto numDevices = drmGetDevices2(0, NULL, 0);
+  std::cout << "Number of drm devices = " << numDevices << std::endl;
 
   std::vector<drmDevicePtr> drmDevicePtrs;
 
-  if (numFiles > 0) {
-    drmDevicePtrs = std::vector<drmDevicePtr>{static_cast<size_t>(numFiles)};
+  if (numDevices > 0) {
+    drmDevicePtrs = std::vector<drmDevicePtr>{static_cast<size_t>(numDevices)};
 
-    numFiles = drmGetDevices2(0U, drmDevicePtrs.data(), numFiles);
-    std::cout << "Number of drm devices = " << numFiles << std::endl;
+    numDevices = drmGetDevices2(0U, drmDevicePtrs.data(), numDevices);
+    std::cout << "Number of drm devices = " << numDevices << std::endl;
     std::cout << "drmDevicePtrs.size() = " << drmDevicePtrs.size() << std::endl;
 
-    if (numFiles != drmDevicePtrs.size()) {
-      std::cout << "Error: drmGetDevices2 returned " << numFiles << ". Exiting" << std::endl;
+    if (numDevices != drmDevicePtrs.size()) {
+      std::cout << "Error: drmGetDevices2 returned " << numDevices << ". Exiting" << std::endl;
       exit(1);
     }
   } // if (numFiles > 0) {
 
-  for (int i = 0; i < numFiles; ++i) {
+  for (int i = 0; i < numDevices; ++i) {
+    auto &device = *(drmDevicePtrs[i]);
     std::cout << "Device no. " << i << ": " << std::endl;
 
-    std::cout << "\tbustype = " << drmDevicePtrs[i]->bustype << std::endl;
-    std::cout << "\tavailable_nodes = " << std::hex << drmDevicePtrs[i]->available_nodes << std::dec
+    switch (device.bustype) {
+    case DRM_BUS_PCI: {
+      auto const &pciDevice = *device.deviceinfo.pci;
+      std::cout << "\tBus type is PCI. Vendor ID = " << pciDevice.vendor_id
+                << ", Device ID = " << pciDevice.device_id << std::endl;
+    } break;
+    case DRM_BUS_USB: {
+      auto const &usbDevice = *device.deviceinfo.usb;
+      std::cout << "\tBus type is USB. Vendor ID = " << usbDevice.vendor
+                << ", product ID = " << usbDevice.product << std::endl;
+    } break;
+    case DRM_BUS_PLATFORM: {
+      auto const &platformDevice = *device.deviceinfo.platform;
+      auto const &platformBus    = *device.businfo.platform;
+      std::cout << "\tBus type is Platform. Compatible strings = ";
+      for (int i = 0; platformDevice.compatible[i] != nullptr; ++i) {
+        std::cout << "\n\t\t[" << i << "]: " << platformDevice.compatible[i];
+      }
+      std::cout << "\n\t Bus full name = " << platformBus.fullname << std::endl;
+    } break;
+    case DRM_BUS_HOST1X:
+      std::cout << "\tBus type is Host1X" << std::endl;
+      break;
+    default:
+      std::cout << "\tUnkown bustype = " << device.bustype << std::endl;
+      break;
+    }
+    std::cout << "\tavailable_nodes = " << std::hex << device.available_nodes << std::dec
               << std::endl;
 
     std::cout << "\tDRM_NODE_PRIMARY = "
-              << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))
-                    ? drmDevicePtrs[i]->nodes[DRM_NODE_PRIMARY]
+              << ((device.available_nodes & (1 << DRM_NODE_PRIMARY))
+                    ? device.nodes[DRM_NODE_PRIMARY]
                     : "<NULL>")
               << std::endl;
     std::cout << "\tDRM_NODE_CONTROL = "
-              << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))
-                    ? drmDevicePtrs[i]->nodes[DRM_NODE_CONTROL]
+              << ((device.available_nodes & (1 << DRM_NODE_PRIMARY))
+                    ? device.nodes[DRM_NODE_CONTROL]
                     : "<NULL>")
               << std::endl;
     std::cout << "\tDRM_NODE_RENDER = "
-              << ((drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))
-                    ? drmDevicePtrs[i]->nodes[DRM_NODE_RENDER]
-                    : "<NULL>")
+              << ((device.available_nodes & (1 << DRM_NODE_PRIMARY)) ? device.nodes[DRM_NODE_RENDER]
+                                                                     : "<NULL>")
               << std::endl;
 
-    if (!(drmDevicePtrs[i]->available_nodes & (1 << DRM_NODE_PRIMARY))) {
+    if (!(device.available_nodes & (1 << DRM_NODE_PRIMARY))) {
       std::cout << "Huu? Does not have a primary node???"
                    "Continue with next device"
                 << std::endl;
@@ -62,10 +88,10 @@ main()
     }
     try {
       Drm::FileDescrShPtr fileDescr =
-        std::make_shared<Drm::FileDescr>(drmDevicePtrs[i]->nodes[DRM_NODE_PRIMARY], O_RDWR);
+        std::make_shared<Drm::FileDescr>(device.nodes[DRM_NODE_PRIMARY], O_RDWR);
       std::cout << "fd for " << fileDescr->getFileName() << " = " << fileDescr->get() << std::endl;
 
-      auto drmRes = Drm::DrmModeResource(fileDescr);
+      auto drmRes = Drm::DrmModeResource(fileDescr, 0);
       std::cout << "drmModeGetResources successful with"
                 << " count_fbs = " << drmRes->count_fbs << " count_crtcs = " << drmRes->count_crtcs
                 << " count_connectors = " << drmRes->count_connectors
@@ -113,15 +139,12 @@ main()
         //*/
         std::cout << "\tEncoders:" << std::endl;
         for (int k = 0; k < conn->count_encoders; ++k) {
-          auto encoder = drmModeGetEncoder(fd, conn->encoders[k]);
-          if (encoder) {
-            std::cout << "\t\t" << "Encoder[" << k << "]:"
-                      << " encoder_id = " << encoder->encoder_id
-                      << " encoder_type = " << encoder->encoder_type
-                      << " crtc_id = " << encoder->crtc_id
-                      << " possible_crtcs = " << encoder->possible_crtcs << std::endl;
-            drmModeFreeEncoder(encoder);
-          }
+          Drm::DrmModeEncoder encoder{fileDescr, conn->encoders[k]};
+          std::cout << "\t\t" << "Encoder[" << k << "]:"
+                    << " encoder_id = " << encoder->encoder_id
+                    << " encoder_type = " << encoder->encoder_type
+                    << " crtc_id = " << encoder->crtc_id
+                    << " possible_crtcs = " << encoder->possible_crtcs << std::endl;
         }
         std::cout << std::endl;
       }

@@ -30,7 +30,6 @@ private:
   std::string exceptionText;
 
 public:
-  ExceptionBase(std::string &&str) : exceptionText{std::move(str)} {}
   ExceptionBase(std::string const &str) : exceptionText{str} {}
 
   virtual char const *what() const noexcept override
@@ -123,234 +122,197 @@ public:
 
 using FileDescrShPtr = std::shared_ptr<FileDescr>;
 
-class ExceptionDrmModeResource final : public ExceptionBase
+template <typename T> class DrmResourceException : public ExceptionBase
 {
 public:
-  ExceptionDrmModeResource(FileDescrShPtr const &fileDescr)
-      : ExceptionBase{std::move([](FileDescrShPtr const &fileDescr) {
-          std::string str{"::drmModeGetResources returned NULL for file \""};
-          str.append(fileDescr->getFileName()).append("\".");
-          return str;
-        }(fileDescr))}
+  DrmResourceException(std::string const &descr)
+      : ExceptionBase{[](std::string const &descr) -> std::string {
+          std::string typeDescr{"Error occurred for type "};
+          typeDescr.append(typeid(T).name()).append(": ").append(descr);
+          return typeDescr;
+        }(descr)}
   {
   }
-  ExceptionDrmModeResource(std::string reason) : ExceptionBase{reason} {}
-}; // class ExceptionDrmModeResource
+}; // template class DrmResourceException
 
-/// \brief Wrapper around ::drmModeRes
-class DrmModeResource final
-{
-  FileDescrShPtr fileDescr;
-  ::drmModeResPtr modeResources = nullptr;
-
-public:
-  DrmModeResource(FileDescrShPtr const &fileDescrShPtr)
-      : fileDescr{fileDescrShPtr}, modeResources{::drmModeGetResources(fileDescr->get())}
-  {
-    if (modeResources == nullptr) {
-      throw DrmModeResource(fileDescr);
-    }
-  }
-  ~DrmModeResource()
-  {
-    if (modeResources) {
-      drmModeFreeResources(modeResources);
-    }
-  }
-
-  DrmModeResource(DrmModeResource const &)            = delete;
-  DrmModeResource &operator=(DrmModeResource const &) = delete;
-
-  DrmModeResource(DrmModeResource &&source) noexcept
-  {
-    if (modeResources != nullptr) {
-      drmModeFreeResources(modeResources);
-    }
-    modeResources        = source.modeResources;
-    source.modeResources = nullptr;
-    fileDescr            = std::move(source.fileDescr);
-  }
-
-  DrmModeResource &operator=(DrmModeResource &&source) noexcept
-  {
-    if (modeResources != nullptr) {
-      drmModeFreeResources(modeResources);
-    }
-    modeResources        = source.modeResources;
-    source.modeResources = nullptr;
-    fileDescr            = std::move(source.fileDescr);
-
-    return *this;
-  }
-
-  ::drmModeResPtr const get() const noexcept
-  {
-    return modeResources;
-  }
-
-  ::drmModeResPtr const operator->() const
-  {
-
-    if (modeResources == nullptr) {
-      throw ExceptionDrmModeResource(
-        "Trying de-referencing a nullptr of a Drm::DrmModeResource object");
-    }
-
-    return modeResources;
-  }
-}; // class DrmModeRes
-
-class ExceptionDrmModeCrtc final : public ExceptionBase
+template <typename T, typename IdT> class DrmResource
 {
 public:
-  ExceptionDrmModeCrtc(FileDescrShPtr const &fileDescr, uint32_t crtcID)
-      : ExceptionBase{std::move([](FileDescrShPtr const &fileDescr, uint32_t crtcID) {
-          std::string str{"::drmModeGetCrtc returned NULL for file \""};
-          str.append(fileDescr->getFileName())
-            .append("\" and crtc_id = ")
-            .append(std::to_string(crtcID));
-          return str;
-        }(fileDescr, crtcID))}
-  {
-  }
-  ExceptionDrmModeCrtc(std::string reason) : ExceptionBase{reason} {}
-}; // class ExceptionDrmModeResource
+  using TPtr               = T *;
+  using TResourceException = DrmResourceException<T>;
 
-class DrmModeCrtc final
-{
 private:
   FileDescrShPtr fileDescr;
-  ::drmModeCrtcPtr modeCrtc = nullptr;
+  IdT resourceID = 0;
+  TPtr resource  = nullptr;
+
+  /** \brief Obtain the pointer to the drm resource.
+   *
+   * This method requires template specialization.
+   * C has no polymorphism. but exilicitly named different functions.
+   */
+  static TPtr getResource(FileDescrShPtr fileDescr, IdT id) noexcept;
+
+  /** \brief Free the drm resource.
+   *
+   * This method requires template specialization.
+   * C has no polymorphism. but explicitly named different functions.
+   */
+  static void freeResource(TPtr resourcePtr) noexcept;
 
 public:
-  DrmModeCrtc(FileDescrShPtr const &fileDescrShPtr, uint32_t crtcId)
-      : fileDescr{fileDescrShPtr}, modeCrtc{::drmModeGetCrtc(fileDescrShPtr->get(), crtcId)}
+  DrmResource(FileDescrShPtr const &fileDescrShPtr, IdT resourceID)
+      : fileDescr{fileDescrShPtr}, resourceID{resourceID},
+        resource{getResource(fileDescrShPtr, resourceID)}
   {
-    if (modeCrtc == nullptr) {
-      throw ExceptionDrmModeCrtc(fileDescrShPtr, crtcId);
+    if (resource == nullptr) {
+      std::string descr{"Cannot obtain the resource for ID "};
+      descr.append(std::to_string(resourceID));
+      throw TResourceException(descr);
     }
   }
-  ~DrmModeCrtc()
+  ~DrmResource()
   {
-    if (modeCrtc != nullptr) {
-      ::drmModeFreeCrtc(modeCrtc);
+    if (resource != nullptr) {
+      freeResource(resource);
     }
   }
 
-  DrmModeCrtc(DrmModeCrtc const &)            = delete;
-  DrmModeCrtc &operator=(DrmModeCrtc const &) = delete;
+  DrmResource(DrmResource const &)            = delete;
+  DrmResource &operator=(DrmResource const &) = delete;
 
-  DrmModeCrtc(DrmModeCrtc &&source) noexcept
+  DrmResource(DrmResource &&source) noexcept
   {
-    if (modeCrtc != nullptr) {
-      ::drmModeFreeCrtc(modeCrtc);
+    if (resource != nullptr) {
+      freeResource(resource);
     }
-    modeCrtc        = source.modeCrtc;
-    source.modeCrtc = nullptr;
-    fileDescr       = std::move(source.fileDescr);
+    resource          = source.resource;
+    source.resource   = nullptr;
+    fileDescr         = std::move(source.fileDescr);
+    resourceID        = source.resourceID;
+    source.resourceID = 0;
   }
-  DrmModeCrtc &operator=(DrmModeCrtc &&source) noexcept
+
+  DrmResource &operator=(DrmResource &&source) noexcept
   {
-    if (modeCrtc != nullptr) {
-      ::drmModeFreeCrtc(modeCrtc);
+    if (resource != nullptr) {
+      freeResource(resource);
     }
-    modeCrtc        = source.modeCrtc;
-    source.modeCrtc = nullptr;
-    fileDescr       = std::move(source.fileDescr);
+    resource          = source.resource;
+    source.resource   = nullptr;
+    fileDescr         = std::move(source.fileDescr);
+    resourceID        = source.resourceID;
+    source.resourceID = 0;
 
     return *this;
   }
 
-  ::drmModeCrtcPtr const get() const noexcept
+  TPtr const get() const noexcept
   {
-    return modeCrtc;
+    return resource;
   }
-  ::drmModeCrtcPtr const operator->() const
+
+  TPtr const operator->() const
   {
-    if (modeCrtc == nullptr) {
-      throw ExceptionDrmModeCrtc("Trying de-referencing a nullptr of a Drm::DrmModeCrtc object");
+
+    if (resource == nullptr) {
+      std::string descr{"Trying de-referencing a nullptr of a "};
+      descr.append(typeid(T).name()).append(" object.");
+      throw TResourceException(descr);
     }
-    return modeCrtc;
+
+    return resource;
   }
+};
 
-}; // class DrmModeCrtc
-
-class ExceptionDrmModeConnector final : public ExceptionBase
+using DrmModeResource = DrmResource<::drmModeRes, uint32_t>;
+/** \brief Required specialization of template class method.
+ *
+ * \param fileDescr File descriptor object
+ * \param id Ignored dummy. Set 0.
+ */
+template <>
+inline ::drmModeResPtr
+DrmResource<drmModeRes, uint32_t>::getResource(FileDescrShPtr fileDescr, uint32_t id) noexcept
 {
-public:
-  ExceptionDrmModeConnector(FileDescrShPtr const &fileDescr, uint32_t connectorID)
-      : ExceptionBase{std::move([](FileDescrShPtr const &fileDescr, uint32_t connectorID) {
-          std::string str{"::drmModeGetConnector returned NULL for file \""};
-          str.append(fileDescr->getFileName())
-            .append("\" and crtc_id = ")
-            .append(std::to_string(connectorID));
-          return str;
-        }(fileDescr, connectorID))}
-  {
-  }
-  ExceptionDrmModeConnector(std::string reason) : ExceptionBase{reason} {}
-}; // class ExceptionDrmModeResource
+  return ::drmModeGetResources(fileDescr->get());
+};
 
-class DrmModeConnector final
+/** \brief Required specialization of template class method.
+ */
+template <>
+inline void
+DrmResource<drmModeRes, uint32_t>::freeResource(::drmModeResPtr resourcePtr) noexcept
 {
-private:
-  FileDescrShPtr fileDescr;
-  ::drmModeConnectorPtr modeConnector = nullptr;
+  ::drmModeFreeResources(resourcePtr);
+}
 
-public:
-  DrmModeConnector(FileDescrShPtr const &fileDescrShPtr, uint32_t connectorId)
-      : fileDescr{fileDescrShPtr},
-        modeConnector{::drmModeGetConnector(fileDescrShPtr->get(), connectorId)}
-  {
-    if (modeConnector == nullptr) {
-      throw ExceptionDrmModeConnector(fileDescrShPtr, connectorId);
-    }
-  }
-  ~DrmModeConnector()
-  {
-    if (modeConnector != nullptr) {
-      ::drmModeFreeConnector(modeConnector);
-    }
-  }
+using DrmModeCrtc = DrmResource<::drmModeCrtc, uint32_t>;
+/** \brief Required specialization of template class method.
+ *
+ * \param fileDescr File descriptor object
+ * \param id Ignored dummy. Set 0.
+ */
+template <>
+inline ::drmModeCrtcPtr
+DrmResource<::drmModeCrtc, uint32_t>::getResource(FileDescrShPtr fileDescr, uint32_t id) noexcept
+{
+  return ::drmModeGetCrtc(fileDescr->get(), id);
+};
 
-  DrmModeConnector(DrmModeConnector const &)            = delete;
-  DrmModeConnector &operator=(DrmModeConnector const &) = delete;
+/** \brief Required specialization of template class method.
+ */
+template <>
+inline void
+DrmResource<::drmModeCrtc, uint32_t>::freeResource(::drmModeCrtcPtr resourcePtr) noexcept
+{
+  ::drmModeFreeCrtc(resourcePtr);
+}
 
-  DrmModeConnector(DrmModeConnector &&source) noexcept
-  {
-    if (modeConnector != nullptr) {
-      ::drmModeFreeConnector(modeConnector);
-    }
-    modeConnector        = source.modeConnector;
-    source.modeConnector = nullptr;
-    fileDescr            = std::move(source.fileDescr);
-  }
-  DrmModeConnector &operator=(DrmModeConnector &&source) noexcept
-  {
-    if (modeConnector != nullptr) {
-      ::drmModeFreeConnector(modeConnector);
-    }
-    modeConnector        = source.modeConnector;
-    source.modeConnector = nullptr;
-    fileDescr            = std::move(source.fileDescr);
+using DrmModeConnector = DrmResource<::drmModeConnector, uint32_t>;
+/** \brief Required specialization of template class method.
+ *
+ * \param fileDescr File descriptor object
+ * \param id Ignored dummy. Set 0.
+ */
+template <>
+inline ::drmModeConnectorPtr
+DrmResource<::drmModeConnector, uint32_t>::getResource(FileDescrShPtr fileDescr,
+                                                       uint32_t id) noexcept
+{
+  return ::drmModeGetConnector(fileDescr->get(), id);
+};
 
-    return *this;
-  }
+/** \brief Required specialization of template class method.
+ */
+template <>
+inline void
+DrmResource<::drmModeConnector, uint32_t>::freeResource(::drmModeConnectorPtr resourcePtr) noexcept
+{
+  ::drmModeFreeConnector(resourcePtr);
+}
 
-  ::drmModeConnectorPtr const get() const noexcept
-  {
-    return modeConnector;
-  }
-  ::drmModeConnectorPtr const operator->() const
-  {
-    if (modeConnector == nullptr) {
-      throw ExceptionDrmModeConnector(
-        "Trying de-referencing a nullptr of a Drm::DrmModeConnector object");
-    }
-    return modeConnector;
-  }
+using DrmModeEncoder = DrmResource<::drmModeEncoder, uint32_t>;
+/** \brief Required specialization of template class method.
+ *
+ * \param fileDescr File descriptor object
+ * \param id Ignored dummy. Set 0.
+ */
+template <>
+inline ::drmModeEncoderPtr
+DrmResource<::drmModeEncoder, uint32_t>::getResource(FileDescrShPtr fileDescr, uint32_t id) noexcept
+{
+  return ::drmModeGetEncoder(fileDescr->get(), id);
+};
 
-}; // class DrmModeConnector
+/** \brief Required specialization of template class method.
+ */
+template <>
+inline void
+DrmResource<::drmModeEncoder, uint32_t>::freeResource(::drmModeEncoderPtr resourcePtr) noexcept
+{
+  ::drmModeFreeEncoder(resourcePtr);
+}
 
 }; // namespace Drm
 #endif /* DRMCXXWRAPPERS_H_ */
