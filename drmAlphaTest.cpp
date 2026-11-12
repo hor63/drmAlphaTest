@@ -91,7 +91,7 @@ main()
         std::make_shared<Drm::FileDescr>(device.nodes[DRM_NODE_PRIMARY], O_RDWR);
       std::cout << "fd for " << fileDescr->getFileName() << " = " << fileDescr->get() << std::endl;
 
-      auto drmRes = Drm::DrmModeResource(fileDescr, 0);
+      Drm::DrmModeResource drmRes {fileDescr};
       std::cout << "drmModeGetResources successful with"
                 << " count_fbs = " << drmRes->count_fbs << " count_crtcs = " << drmRes->count_crtcs
                 << " count_connectors = " << drmRes->count_connectors
@@ -153,11 +153,43 @@ main()
                 << " supports Kernel Mode Switching: "
                 << (drmIsKMS(fileDescr->get()) ? "Yes" : "No") << std::endl;
 
+      // Planes
+      {
+        drmSetClientCap(fileDescr->get(), DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
+
+        Drm::DrmModePlaneRes planeResources (fileDescr);
+        std::cout << "count_planes = " << planeResources->count_planes << std::endl;
+        for (int k = 0; k < planeResources->count_planes; ++k) {
+          Drm::DrmModePlane plane {fileDescr,planeResources->planes[k]};
+          
+          std::cout << "Plane [" << k << "]:"
+            << " count_formats = " << plane->count_formats
+          << " plane_id = " << plane->plane_id
+
+          << " crtc_id  = " << plane->crtc_id
+          << " fb_id = " << plane->fb_id
+
+          << " crtc_x = " << plane->crtc_x
+          << " crtc_y = " << plane->crtc_y
+          << " x, y = " << plane->x << 'x' << plane->y
+
+          << " possible_crtcs = " << plane->possible_crtcs
+          << " gamma_size = " << plane->gamma_size
+          << std::endl;
+          
+          std::cout << "\t\tFormats =" << std::hex;
+          for (int l = 0; l < plane->count_formats; l++) {
+             std::cout << ' ' << plane->formats[l];
+          }
+          std::cout << std::endl;
+        }
+      }
+
     } catch (std::exception const &exp) {
       std::cerr << exp.what();
     }
-
-  } // for (int i = 0 ; i < numFiles; ++i) {
+    
+  } // for (int i = 0; i < numDevices; ++i)
 
   drmFreeDevices(drmDevicePtrs.data(), drmDevicePtrs.size());
 
