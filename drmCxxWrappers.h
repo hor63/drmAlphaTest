@@ -150,6 +150,17 @@ private:
    *
    * This method requires template specialization.
    * C has no polymorphism. but exilicitly named different functions.
+   * A specialization must be implemented when the C function to get the resource
+   * only requires the file descriptor, but no specific ID.
+   */
+  static TPtr getResource(FileDescrShPtr fileDescr) noexcept;
+  
+  /** \brief Obtain the pointer to the drm resource by ID.
+   *
+   * This method requires template specialization.
+   * C has no polymorphism. but exilicitly named different functions.
+   * A specialization must be implemented when the C function to get the resource
+   * requires a specific ID in addition to the file descriptor.
    */
   static TPtr getResource(FileDescrShPtr fileDescr, IdT id) noexcept;
 
@@ -161,6 +172,7 @@ private:
   static void freeResource(TPtr resourcePtr) noexcept;
 
 public:
+
   DrmResource(FileDescrShPtr const &fileDescrShPtr, IdT resourceID)
       : fileDescr{fileDescrShPtr}, resourceID{resourceID},
         resource{getResource(fileDescrShPtr, resourceID)}
@@ -171,6 +183,18 @@ public:
       throw TResourceException(descr);
     }
   }
+
+  DrmResource(FileDescrShPtr const &fileDescrShPtr)
+      : fileDescr{fileDescrShPtr}, resourceID{0},
+        resource{getResource(fileDescrShPtr)}
+  {
+    if (resource == nullptr) {
+      std::string descr{"Cannot obtain the resource for ID "};
+      descr.append(std::to_string(resourceID));
+      throw TResourceException(descr);
+    }
+  }
+
   ~DrmResource()
   {
     if (resource != nullptr) {
@@ -233,7 +257,7 @@ using DrmModeResource = DrmResource<::drmModeRes, uint32_t>;
  */
 template <>
 inline ::drmModeResPtr
-DrmResource<drmModeRes, uint32_t>::getResource(FileDescrShPtr fileDescr, uint32_t id) noexcept
+DrmResource<drmModeRes, uint32_t>::getResource(FileDescrShPtr fileDescr) noexcept
 {
   return ::drmModeGetResources(fileDescr->get());
 };
@@ -313,6 +337,51 @@ DrmResource<::drmModeEncoder, uint32_t>::freeResource(::drmModeEncoderPtr resour
 {
   ::drmModeFreeEncoder(resourcePtr);
 }
+
+
+using DrmModePlaneRes = DrmResource<::drmModePlaneRes, uint32_t>;
+/** \brief Required specialization of template class method.
+ *
+ * \param fileDescr File descriptor object
+ */
+template <>
+inline ::drmModePlaneResPtr
+DrmResource<::drmModePlaneRes, uint32_t>::getResource(FileDescrShPtr fileDescr) noexcept
+{
+  return ::drmModeGetPlaneResources(fileDescr->get());
+};
+
+/** \brief Required specialization of template class method.
+ */
+template <>
+inline void
+DrmResource<::drmModePlaneRes, uint32_t>::freeResource(::drmModePlaneResPtr resourcePtr) noexcept
+{
+  ::drmModeFreePlaneResources(resourcePtr);
+}
+
+using DrmModePlane = DrmResource<::drmModePlane, uint32_t>;
+/** \brief Required specialization of template class method.
+ *
+ * \param fileDescr File descriptor object
+ * \param id Ignored dummy. Set 0.
+ */
+template <>
+inline ::drmModePlanePtr
+DrmResource<::drmModePlane, uint32_t>::getResource(FileDescrShPtr fileDescr, uint32_t id) noexcept
+{
+  return ::drmModeGetPlane(fileDescr->get(),id);
+};
+
+/** \brief Required specialization of template class method.
+ */
+template <>
+inline void
+DrmResource<::drmModePlane, uint32_t>::freeResource(::drmModePlanePtr resourcePtr) noexcept
+{
+  ::drmModeFreePlane(resourcePtr);
+}
+
 
 }; // namespace Drm
 #endif /* DRMCXXWRAPPERS_H_ */
