@@ -1,0 +1,530 @@
+Node: /dev/dri/card0
+├───Driver: vmwgfx (Linux drm driver for VMware graphics devices) version 2.21.0 (0)
+│   ├───DRM_CLIENT_CAP_STEREO_3D supported
+│   ├───DRM_CLIENT_CAP_UNIVERSAL_PLANES supported
+│   ├───DRM_CLIENT_CAP_ATOMIC supported
+│   ├───DRM_CLIENT_CAP_ASPECT_RATIO supported
+│   ├───DRM_CLIENT_CAP_WRITEBACK_CONNECTORS supported
+│   ├───DRM_CAP_DUMB_BUFFER = 1
+│   ├───DRM_CAP_VBLANK_HIGH_CRTC = 1
+│   ├───DRM_CAP_DUMB_PREFERRED_DEPTH = 32
+│   ├───DRM_CAP_DUMB_PREFER_SHADOW = 0
+│   ├───DRM_CAP_PRIME = 3
+│   ├───DRM_CAP_TIMESTAMP_MONOTONIC = 1
+│   ├───DRM_CAP_ASYNC_PAGE_FLIP = 0
+│   ├───DRM_CAP_CURSOR_WIDTH = 64
+│   ├───DRM_CAP_CURSOR_HEIGHT = 64
+│   ├───DRM_CAP_ADDFB2_MODIFIERS = 1
+│   ├───DRM_CAP_PAGE_FLIP_TARGET = 0
+│   ├───DRM_CAP_CRTC_IN_VBLANK_EVENT = 1
+│   ├───DRM_CAP_SYNCOBJ = 0
+│   └───DRM_CAP_SYNCOBJ_TIMELINE = 0
+├───Device: PCI 15ad:0405 VMware SVGA II Adapter
+│   └───Available nodes: primary, render
+├───Framebuffer size
+│   ├───Width: [1, 16384]
+│   └───Height: [1, 16384]
+├───Connectors
+│   ├───Connector 0
+│   │   ├───Object ID: 43
+│   │   ├───Type: virtual
+│   │   ├───Status: connected
+│   │   ├───Physical size: 0x0 mm
+│   │   ├───Subpixel: unknown
+│   │   ├───Encoders: {0}
+│   │   ├───Modes
+│   │   │   ├───1920x1200@60.00 preferred driver nhsync pvsync 
+│   │   │   ├───4096x2160@60.00 driver phsync nvsync 
+│   │   │   ├───4096x2160@59.94 driver phsync nvsync 
+│   │   │   ├───2560x1600@59.99 driver nhsync pvsync 
+│   │   │   ├───2560x1600@59.97 driver phsync nvsync 
+│   │   │   ├───1920x1440@60.00 driver nhsync pvsync 
+│   │   │   ├───1856x1392@59.99 driver nhsync pvsync 
+│   │   │   ├───1792x1344@60.00 driver nhsync pvsync 
+│   │   │   ├───2048x1152@60.00 driver phsync pvsync 
+│   │   │   ├───1920x1200@59.88 driver nhsync pvsync 
+│   │   │   ├───1920x1200@59.95 driver phsync nvsync 
+│   │   │   ├───1920x1080@60.00 driver nhsync nvsync 
+│   │   │   ├───1600x1200@60.00 driver phsync pvsync 
+│   │   │   ├───1680x1050@59.95 driver nhsync pvsync 
+│   │   │   ├───1680x1050@59.88 driver phsync nvsync 
+│   │   │   ├───1400x1050@59.98 driver nhsync pvsync 
+│   │   │   ├───1400x1050@59.95 driver phsync nvsync 
+│   │   │   ├───1600x900@60.00 driver phsync pvsync 
+│   │   │   ├───1280x1024@60.02 driver phsync pvsync 
+│   │   │   ├───1440x900@59.89 driver nhsync pvsync 
+│   │   │   ├───1440x900@59.90 driver phsync nvsync 
+│   │   │   ├───1280x960@60.00 driver phsync pvsync 
+│   │   │   ├───1366x768@59.79 driver phsync pvsync 
+│   │   │   ├───1366x768@60.00 driver phsync pvsync 
+│   │   │   ├───1360x768@60.02 driver phsync pvsync 
+│   │   │   ├───1280x800@59.81 driver nhsync pvsync 
+│   │   │   ├───1280x800@59.91 driver phsync nvsync 
+│   │   │   ├───1280x768@59.87 driver nhsync pvsync 
+│   │   │   ├───1280x768@59.99 driver phsync nvsync 
+│   │   │   ├───1280x720@60.00 driver phsync pvsync 
+│   │   │   ├───1024x768@60.00 driver nhsync nvsync 
+│   │   │   ├───800x600@60.32 driver phsync pvsync 
+│   │   │   ├───800x600@56.25 driver phsync pvsync 
+│   │   │   ├───848x480@60.00 driver phsync pvsync 
+│   │   │   └───640x480@59.94 driver nhsync nvsync 
+│   │   └───Properties
+│   │       ├───"DPMS": enum {On, Standby, Suspend, Off} = On
+│   │       ├───"link-status": enum {Good, Bad} = Good
+│   │       ├───"non-desktop" (immutable): range [0, 1] = 0
+│   │       ├───"TILE" (immutable): blob = 0
+│   │       ├───"CRTC_ID" (atomic): object CRTC = 45
+│   │       ├───"hotplug_mode_update" (immutable): range [0, 1] = 1
+│   │       ├───"suggested X" (immutable): range [0, UINT32_MAX] = 0
+│   │       └───"suggested Y" (immutable): range [0, UINT32_MAX] = 0
+│   ├───Connector 1
+│   │   ├───Object ID: 52
+│   │   ├───Type: virtual
+│   │   ├───Status: disconnected
+│   │   ├───Encoders: {1}
+│   │   └───Properties
+│   │       ├───"DPMS": enum {On, Standby, Suspend, Off} = On
+│   │       ├───"link-status": enum {Good, Bad} = Good
+│   │       ├───"non-desktop" (immutable): range [0, 1] = 0
+│   │       ├───"TILE" (immutable): blob = 0
+│   │       ├───"CRTC_ID" (atomic): object CRTC = 0
+│   │       ├───"hotplug_mode_update" (immutable): range [0, 1] = 1
+│   │       ├───"suggested X" (immutable): range [0, UINT32_MAX] = 0
+│   │       └───"suggested Y" (immutable): range [0, UINT32_MAX] = 0
+│   ├───Connector 2
+│   │   ├───Object ID: 61
+│   │   ├───Type: virtual
+│   │   ├───Status: disconnected
+│   │   ├───Encoders: {2}
+│   │   └───Properties
+│   │       ├───"DPMS": enum {On, Standby, Suspend, Off} = On
+│   │       ├───"link-status": enum {Good, Bad} = Good
+│   │       ├───"non-desktop" (immutable): range [0, 1] = 0
+│   │       ├───"TILE" (immutable): blob = 0
+│   │       ├───"CRTC_ID" (atomic): object CRTC = 0
+│   │       ├───"hotplug_mode_update" (immutable): range [0, 1] = 1
+│   │       ├───"suggested X" (immutable): range [0, UINT32_MAX] = 0
+│   │       └───"suggested Y" (immutable): range [0, UINT32_MAX] = 0
+│   ├───Connector 3
+│   │   ├───Object ID: 70
+│   │   ├───Type: virtual
+│   │   ├───Status: disconnected
+│   │   ├───Encoders: {3}
+│   │   └───Properties
+│   │       ├───"DPMS": enum {On, Standby, Suspend, Off} = On
+│   │       ├───"link-status": enum {Good, Bad} = Good
+│   │       ├───"non-desktop" (immutable): range [0, 1] = 0
+│   │       ├───"TILE" (immutable): blob = 0
+│   │       ├───"CRTC_ID" (atomic): object CRTC = 0
+│   │       ├───"hotplug_mode_update" (immutable): range [0, 1] = 1
+│   │       ├───"suggested X" (immutable): range [0, UINT32_MAX] = 0
+│   │       └───"suggested Y" (immutable): range [0, UINT32_MAX] = 0
+│   ├───Connector 4
+│   │   ├───Object ID: 79
+│   │   ├───Type: virtual
+│   │   ├───Status: disconnected
+│   │   ├───Encoders: {4}
+│   │   └───Properties
+│   │       ├───"DPMS": enum {On, Standby, Suspend, Off} = On
+│   │       ├───"link-status": enum {Good, Bad} = Good
+│   │       ├───"non-desktop" (immutable): range [0, 1] = 0
+│   │       ├───"TILE" (immutable): blob = 0
+│   │       ├───"CRTC_ID" (atomic): object CRTC = 0
+│   │       ├───"hotplug_mode_update" (immutable): range [0, 1] = 1
+│   │       ├───"suggested X" (immutable): range [0, UINT32_MAX] = 0
+│   │       └───"suggested Y" (immutable): range [0, UINT32_MAX] = 0
+│   ├───Connector 5
+│   │   ├───Object ID: 88
+│   │   ├───Type: virtual
+│   │   ├───Status: disconnected
+│   │   ├───Encoders: {5}
+│   │   └───Properties
+│   │       ├───"DPMS": enum {On, Standby, Suspend, Off} = On
+│   │       ├───"link-status": enum {Good, Bad} = Good
+│   │       ├───"non-desktop" (immutable): range [0, 1] = 0
+│   │       ├───"TILE" (immutable): blob = 0
+│   │       ├───"CRTC_ID" (atomic): object CRTC = 0
+│   │       ├───"hotplug_mode_update" (immutable): range [0, 1] = 1
+│   │       ├───"suggested X" (immutable): range [0, UINT32_MAX] = 0
+│   │       └───"suggested Y" (immutable): range [0, UINT32_MAX] = 0
+│   ├───Connector 6
+│   │   ├───Object ID: 97
+│   │   ├───Type: virtual
+│   │   ├───Status: disconnected
+│   │   ├───Encoders: {6}
+│   │   └───Properties
+│   │       ├───"DPMS": enum {On, Standby, Suspend, Off} = On
+│   │       ├───"link-status": enum {Good, Bad} = Good
+│   │       ├───"non-desktop" (immutable): range [0, 1] = 0
+│   │       ├───"TILE" (immutable): blob = 0
+│   │       ├───"CRTC_ID" (atomic): object CRTC = 0
+│   │       ├───"hotplug_mode_update" (immutable): range [0, 1] = 1
+│   │       ├───"suggested X" (immutable): range [0, UINT32_MAX] = 0
+│   │       └───"suggested Y" (immutable): range [0, UINT32_MAX] = 0
+│   └───Connector 7
+│       ├───Object ID: 106
+│       ├───Type: virtual
+│       ├───Status: disconnected
+│       ├───Encoders: {7}
+│       └───Properties
+│           ├───"DPMS": enum {On, Standby, Suspend, Off} = On
+│           ├───"link-status": enum {Good, Bad} = Good
+│           ├───"non-desktop" (immutable): range [0, 1] = 0
+│           ├───"TILE" (immutable): blob = 0
+│           ├───"CRTC_ID" (atomic): object CRTC = 0
+│           ├───"hotplug_mode_update" (immutable): range [0, 1] = 1
+│           ├───"suggested X" (immutable): range [0, UINT32_MAX] = 0
+│           └───"suggested Y" (immutable): range [0, UINT32_MAX] = 0
+├───Encoders
+│   ├───Encoder 0
+│   │   ├───Object ID: 44
+│   │   ├───Type: virtual
+│   │   ├───CRTCS: {0}
+│   │   └───Clones: {0}
+│   ├───Encoder 1
+│   │   ├───Object ID: 53
+│   │   ├───Type: virtual
+│   │   ├───CRTCS: {1}
+│   │   └───Clones: {1}
+│   ├───Encoder 2
+│   │   ├───Object ID: 62
+│   │   ├───Type: virtual
+│   │   ├───CRTCS: {2}
+│   │   └───Clones: {2}
+│   ├───Encoder 3
+│   │   ├───Object ID: 71
+│   │   ├───Type: virtual
+│   │   ├───CRTCS: {3}
+│   │   └───Clones: {3}
+│   ├───Encoder 4
+│   │   ├───Object ID: 80
+│   │   ├───Type: virtual
+│   │   ├───CRTCS: {4}
+│   │   └───Clones: {4}
+│   ├───Encoder 5
+│   │   ├───Object ID: 89
+│   │   ├───Type: virtual
+│   │   ├───CRTCS: {5}
+│   │   └───Clones: {5}
+│   ├───Encoder 6
+│   │   ├───Object ID: 98
+│   │   ├───Type: virtual
+│   │   ├───CRTCS: {6}
+│   │   └───Clones: {6}
+│   └───Encoder 7
+│       ├───Object ID: 107
+│       ├───Type: virtual
+│       ├───CRTCS: {7}
+│       └───Clones: {7}
+├───CRTCs
+│   ├───CRTC 0
+│   │   ├───Object ID: 45
+│   │   ├───Mode: 1920x1200@60.00 preferred driver nhsync pvsync 
+│   │   ├───Gamma size: 256
+│   │   └───Properties
+│   │       ├───"ACTIVE" (atomic): range [0, 1] = 1
+│   │       ├───"MODE_ID" (atomic): blob = 111
+│   │       │   └───1920x1200@60.00 preferred driver nhsync pvsync 
+│   │       ├───"OUT_FENCE_PTR" (atomic): range [0, UINT64_MAX] = 0
+│   │       └───"VRR_ENABLED": range [0, 1] = 0
+│   ├───CRTC 1
+│   │   ├───Object ID: 54
+│   │   ├───Gamma size: 256
+│   │   └───Properties
+│   │       ├───"ACTIVE" (atomic): range [0, 1] = 0
+│   │       ├───"MODE_ID" (atomic): blob = 0
+│   │       ├───"OUT_FENCE_PTR" (atomic): range [0, UINT64_MAX] = 0
+│   │       └───"VRR_ENABLED": range [0, 1] = 0
+│   ├───CRTC 2
+│   │   ├───Object ID: 63
+│   │   ├───Gamma size: 256
+│   │   └───Properties
+│   │       ├───"ACTIVE" (atomic): range [0, 1] = 0
+│   │       ├───"MODE_ID" (atomic): blob = 0
+│   │       ├───"OUT_FENCE_PTR" (atomic): range [0, UINT64_MAX] = 0
+│   │       └───"VRR_ENABLED": range [0, 1] = 0
+│   ├───CRTC 3
+│   │   ├───Object ID: 72
+│   │   ├───Gamma size: 256
+│   │   └───Properties
+│   │       ├───"ACTIVE" (atomic): range [0, 1] = 0
+│   │       ├───"MODE_ID" (atomic): blob = 0
+│   │       ├───"OUT_FENCE_PTR" (atomic): range [0, UINT64_MAX] = 0
+│   │       └───"VRR_ENABLED": range [0, 1] = 0
+│   ├───CRTC 4
+│   │   ├───Object ID: 81
+│   │   ├───Gamma size: 256
+│   │   └───Properties
+│   │       ├───"ACTIVE" (atomic): range [0, 1] = 0
+│   │       ├───"MODE_ID" (atomic): blob = 0
+│   │       ├───"OUT_FENCE_PTR" (atomic): range [0, UINT64_MAX] = 0
+│   │       └───"VRR_ENABLED": range [0, 1] = 0
+│   ├───CRTC 5
+│   │   ├───Object ID: 90
+│   │   ├───Gamma size: 256
+│   │   └───Properties
+│   │       ├───"ACTIVE" (atomic): range [0, 1] = 0
+│   │       ├───"MODE_ID" (atomic): blob = 0
+│   │       ├───"OUT_FENCE_PTR" (atomic): range [0, UINT64_MAX] = 0
+│   │       └───"VRR_ENABLED": range [0, 1] = 0
+│   ├───CRTC 6
+│   │   ├───Object ID: 99
+│   │   ├───Gamma size: 256
+│   │   └───Properties
+│   │       ├───"ACTIVE" (atomic): range [0, 1] = 0
+│   │       ├───"MODE_ID" (atomic): blob = 0
+│   │       ├───"OUT_FENCE_PTR" (atomic): range [0, UINT64_MAX] = 0
+│   │       └───"VRR_ENABLED": range [0, 1] = 0
+│   └───CRTC 7
+│       ├───Object ID: 108
+│       ├───Gamma size: 256
+│       └───Properties
+│           ├───"ACTIVE" (atomic): range [0, 1] = 0
+│           ├───"MODE_ID" (atomic): blob = 0
+│           ├───"OUT_FENCE_PTR" (atomic): range [0, UINT64_MAX] = 0
+│           └───"VRR_ENABLED": range [0, 1] = 0
+└───Planes
+    ├───Plane 0
+    │   ├───Object ID: 37
+    │   ├───CRTCs: {0}
+    │   ├───FB ID: 110
+    │   │   ├───Object ID: 110
+    │   │   ├───Size: 1920x1200
+    │   │   ├───Format: XRGB8888 (0x34325258)
+    │   │   ├───Modifier: DRM_FORMAT_MOD_LINEAR (0x0)
+    │   │   └───Planes:
+    │   │       └───Plane 0: offset = 0, pitch = 7680
+    │   ├───Formats:
+    │   │   ├───XRGB8888 (0x34325258)
+    │   │   ├───ARGB8888 (0x34325241)
+    │   │   ├───RGB565 (0x36314752)
+    │   │   └───XRGB1555 (0x35315258)
+    │   └───Properties
+    │       ├───"type" (immutable): enum {Overlay, Primary, Cursor} = Primary
+    │       ├───"FB_ID" (atomic): object framebuffer = 110
+    │       │   ├───Object ID: 110
+    │       │   ├───Size: 1920x1200
+    │       │   ├───Format: XRGB8888 (0x34325258)
+    │       │   ├───Modifier: DRM_FORMAT_MOD_LINEAR (0x0)
+    │       │   └───Planes:
+    │       │       └───Plane 0: offset = 0, pitch = 7680
+    │       ├───"IN_FENCE_FD" (atomic): srange [-1, INT32_MAX] = -1
+    │       ├───"CRTC_ID" (atomic): object CRTC = 45
+    │       ├───"CRTC_X" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_Y" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_W" (atomic): range [0, INT32_MAX] = 1920
+    │       ├───"CRTC_H" (atomic): range [0, INT32_MAX] = 1200
+    │       ├───"SRC_X" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_Y" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_W" (atomic): range [0, UINT32_MAX] = 1920
+    │       ├───"SRC_H" (atomic): range [0, UINT32_MAX] = 1200
+    │       ├───"IN_FORMATS" (immutable): blob = 38
+    │       │   └───DRM_FORMAT_MOD_LINEAR (0x0)
+    │       │       ├───XRGB8888 (0x34325258)
+    │       │       ├───ARGB8888 (0x34325241)
+    │       │       ├───RGB565 (0x36314752)
+    │       │       └───XRGB1555 (0x35315258)
+    │       └───"FB_DAMAGE_CLIPS" (atomic): blob = 113
+    ├───Plane 1
+    │   ├───Object ID: 46
+    │   ├───CRTCs: {1}
+    │   ├───FB ID: 0
+    │   ├───Formats:
+    │   │   ├───XRGB8888 (0x34325258)
+    │   │   ├───ARGB8888 (0x34325241)
+    │   │   ├───RGB565 (0x36314752)
+    │   │   └───XRGB1555 (0x35315258)
+    │   └───Properties
+    │       ├───"type" (immutable): enum {Overlay, Primary, Cursor} = Primary
+    │       ├───"FB_ID" (atomic): object framebuffer = 0
+    │       ├───"IN_FENCE_FD" (atomic): srange [-1, INT32_MAX] = -1
+    │       ├───"CRTC_ID" (atomic): object CRTC = 0
+    │       ├───"CRTC_X" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_Y" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_W" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"CRTC_H" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"SRC_X" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_Y" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_W" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_H" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"IN_FORMATS" (immutable): blob = 47
+    │       │   └───DRM_FORMAT_MOD_LINEAR (0x0)
+    │       │       ├───XRGB8888 (0x34325258)
+    │       │       ├───ARGB8888 (0x34325241)
+    │       │       ├───RGB565 (0x36314752)
+    │       │       └───XRGB1555 (0x35315258)
+    │       └───"FB_DAMAGE_CLIPS" (atomic): blob = 0
+    ├───Plane 2
+    │   ├───Object ID: 55
+    │   ├───CRTCs: {2}
+    │   ├───FB ID: 0
+    │   ├───Formats:
+    │   │   ├───XRGB8888 (0x34325258)
+    │   │   ├───ARGB8888 (0x34325241)
+    │   │   ├───RGB565 (0x36314752)
+    │   │   └───XRGB1555 (0x35315258)
+    │   └───Properties
+    │       ├───"type" (immutable): enum {Overlay, Primary, Cursor} = Primary
+    │       ├───"FB_ID" (atomic): object framebuffer = 0
+    │       ├───"IN_FENCE_FD" (atomic): srange [-1, INT32_MAX] = -1
+    │       ├───"CRTC_ID" (atomic): object CRTC = 0
+    │       ├───"CRTC_X" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_Y" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_W" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"CRTC_H" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"SRC_X" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_Y" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_W" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_H" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"IN_FORMATS" (immutable): blob = 56
+    │       │   └───DRM_FORMAT_MOD_LINEAR (0x0)
+    │       │       ├───XRGB8888 (0x34325258)
+    │       │       ├───ARGB8888 (0x34325241)
+    │       │       ├───RGB565 (0x36314752)
+    │       │       └───XRGB1555 (0x35315258)
+    │       └───"FB_DAMAGE_CLIPS" (atomic): blob = 0
+    ├───Plane 3
+    │   ├───Object ID: 64
+    │   ├───CRTCs: {3}
+    │   ├───FB ID: 0
+    │   ├───Formats:
+    │   │   ├───XRGB8888 (0x34325258)
+    │   │   ├───ARGB8888 (0x34325241)
+    │   │   ├───RGB565 (0x36314752)
+    │   │   └───XRGB1555 (0x35315258)
+    │   └───Properties
+    │       ├───"type" (immutable): enum {Overlay, Primary, Cursor} = Primary
+    │       ├───"FB_ID" (atomic): object framebuffer = 0
+    │       ├───"IN_FENCE_FD" (atomic): srange [-1, INT32_MAX] = -1
+    │       ├───"CRTC_ID" (atomic): object CRTC = 0
+    │       ├───"CRTC_X" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_Y" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_W" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"CRTC_H" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"SRC_X" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_Y" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_W" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_H" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"IN_FORMATS" (immutable): blob = 65
+    │       │   └───DRM_FORMAT_MOD_LINEAR (0x0)
+    │       │       ├───XRGB8888 (0x34325258)
+    │       │       ├───ARGB8888 (0x34325241)
+    │       │       ├───RGB565 (0x36314752)
+    │       │       └───XRGB1555 (0x35315258)
+    │       └───"FB_DAMAGE_CLIPS" (atomic): blob = 0
+    ├───Plane 4
+    │   ├───Object ID: 73
+    │   ├───CRTCs: {4}
+    │   ├───FB ID: 0
+    │   ├───Formats:
+    │   │   ├───XRGB8888 (0x34325258)
+    │   │   ├───ARGB8888 (0x34325241)
+    │   │   ├───RGB565 (0x36314752)
+    │   │   └───XRGB1555 (0x35315258)
+    │   └───Properties
+    │       ├───"type" (immutable): enum {Overlay, Primary, Cursor} = Primary
+    │       ├───"FB_ID" (atomic): object framebuffer = 0
+    │       ├───"IN_FENCE_FD" (atomic): srange [-1, INT32_MAX] = -1
+    │       ├───"CRTC_ID" (atomic): object CRTC = 0
+    │       ├───"CRTC_X" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_Y" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_W" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"CRTC_H" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"SRC_X" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_Y" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_W" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_H" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"IN_FORMATS" (immutable): blob = 74
+    │       │   └───DRM_FORMAT_MOD_LINEAR (0x0)
+    │       │       ├───XRGB8888 (0x34325258)
+    │       │       ├───ARGB8888 (0x34325241)
+    │       │       ├───RGB565 (0x36314752)
+    │       │       └───XRGB1555 (0x35315258)
+    │       └───"FB_DAMAGE_CLIPS" (atomic): blob = 0
+    ├───Plane 5
+    │   ├───Object ID: 82
+    │   ├───CRTCs: {5}
+    │   ├───FB ID: 0
+    │   ├───Formats:
+    │   │   ├───XRGB8888 (0x34325258)
+    │   │   ├───ARGB8888 (0x34325241)
+    │   │   ├───RGB565 (0x36314752)
+    │   │   └───XRGB1555 (0x35315258)
+    │   └───Properties
+    │       ├───"type" (immutable): enum {Overlay, Primary, Cursor} = Primary
+    │       ├───"FB_ID" (atomic): object framebuffer = 0
+    │       ├───"IN_FENCE_FD" (atomic): srange [-1, INT32_MAX] = -1
+    │       ├───"CRTC_ID" (atomic): object CRTC = 0
+    │       ├───"CRTC_X" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_Y" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_W" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"CRTC_H" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"SRC_X" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_Y" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_W" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_H" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"IN_FORMATS" (immutable): blob = 83
+    │       │   └───DRM_FORMAT_MOD_LINEAR (0x0)
+    │       │       ├───XRGB8888 (0x34325258)
+    │       │       ├───ARGB8888 (0x34325241)
+    │       │       ├───RGB565 (0x36314752)
+    │       │       └───XRGB1555 (0x35315258)
+    │       └───"FB_DAMAGE_CLIPS" (atomic): blob = 0
+    ├───Plane 6
+    │   ├───Object ID: 91
+    │   ├───CRTCs: {6}
+    │   ├───FB ID: 0
+    │   ├───Formats:
+    │   │   ├───XRGB8888 (0x34325258)
+    │   │   ├───ARGB8888 (0x34325241)
+    │   │   ├───RGB565 (0x36314752)
+    │   │   └───XRGB1555 (0x35315258)
+    │   └───Properties
+    │       ├───"type" (immutable): enum {Overlay, Primary, Cursor} = Primary
+    │       ├───"FB_ID" (atomic): object framebuffer = 0
+    │       ├───"IN_FENCE_FD" (atomic): srange [-1, INT32_MAX] = -1
+    │       ├───"CRTC_ID" (atomic): object CRTC = 0
+    │       ├───"CRTC_X" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_Y" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+    │       ├───"CRTC_W" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"CRTC_H" (atomic): range [0, INT32_MAX] = 0
+    │       ├───"SRC_X" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_Y" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_W" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"SRC_H" (atomic): range [0, UINT32_MAX] = 0
+    │       ├───"IN_FORMATS" (immutable): blob = 92
+    │       │   └───DRM_FORMAT_MOD_LINEAR (0x0)
+    │       │       ├───XRGB8888 (0x34325258)
+    │       │       ├───ARGB8888 (0x34325241)
+    │       │       ├───RGB565 (0x36314752)
+    │       │       └───XRGB1555 (0x35315258)
+    │       └───"FB_DAMAGE_CLIPS" (atomic): blob = 0
+    └───Plane 7
+        ├───Object ID: 100
+        ├───CRTCs: {7}
+        ├───FB ID: 0
+        ├───Formats:
+        │   ├───XRGB8888 (0x34325258)
+        │   ├───ARGB8888 (0x34325241)
+        │   ├───RGB565 (0x36314752)
+        │   └───XRGB1555 (0x35315258)
+        └───Properties
+            ├───"type" (immutable): enum {Overlay, Primary, Cursor} = Primary
+            ├───"FB_ID" (atomic): object framebuffer = 0
+            ├───"IN_FENCE_FD" (atomic): srange [-1, INT32_MAX] = -1
+            ├───"CRTC_ID" (atomic): object CRTC = 0
+            ├───"CRTC_X" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+            ├───"CRTC_Y" (atomic): srange [INT32_MIN, INT32_MAX] = 0
+            ├───"CRTC_W" (atomic): range [0, INT32_MAX] = 0
+            ├───"CRTC_H" (atomic): range [0, INT32_MAX] = 0
+            ├───"SRC_X" (atomic): range [0, UINT32_MAX] = 0
+            ├───"SRC_Y" (atomic): range [0, UINT32_MAX] = 0
+            ├───"SRC_W" (atomic): range [0, UINT32_MAX] = 0
+            ├───"SRC_H" (atomic): range [0, UINT32_MAX] = 0
+            ├───"IN_FORMATS" (immutable): blob = 101
+            │   └───DRM_FORMAT_MOD_LINEAR (0x0)
+            │       ├───XRGB8888 (0x34325258)
+            │       ├───ARGB8888 (0x34325241)
+            │       ├───RGB565 (0x36314752)
+            │       └───XRGB1555 (0x35315258)
+            └───"FB_DAMAGE_CLIPS" (atomic): blob = 0
